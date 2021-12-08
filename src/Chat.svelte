@@ -28,6 +28,9 @@
 
   $: debouncedWatchScroll = debounce(watchScroll, 1000);
 
+  // Key for end-to-end encryption
+  const key = '#gordon-chat-app';
+
   onMount(() => {
     var match = {
       // lexical queries are kind of like a limited RegEx or Glob.
@@ -39,12 +42,10 @@
     };
 
     // Get Messages
-    db.get('chat')
+    db.get('chatter')
       .map(match)
       .once(async (data, id) => {
         if (data) {
-          // Key for end-to-end encryption
-          const key = '#foo';
 
           var message = {
             // transform the data
@@ -66,10 +67,10 @@
   });
 
   async function sendMessage() {
-    const secret = await SEA.encrypt(newMessage, '#foo');
+    const secret = await SEA.encrypt(newMessage, key);
     const message = user.get('all').set({ what: secret });
     const index = new Date().toISOString();
-    db.get('chat').get(index).put(message);
+    db.get('chatter').get(index).put(message);
     newMessage = '';
     canAutoScroll = true;
     autoScroll();
